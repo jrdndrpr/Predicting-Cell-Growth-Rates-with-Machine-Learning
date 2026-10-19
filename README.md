@@ -90,7 +90,7 @@ A feature-effects visualization script passes synthetic ranges for each variable
 
 Three machine learning regression model architectures were benchmarked to predict specific cell growth rates based on cell culture operating conditions: linear regression, polynomial regression, and k-nearest neighbors (KNN) regression. Every model was trained and evaluated using five-fold cross-validation on an eighty percent training split, followed by final performance scoring on an isolated, untouched twenty percent test dataset.
 
-| Model Architecture | Hyperparameters | Cross-Validation RMSE ($\text{d}^{-1}$) | Test RMSE ($\text{d}^{-1}$) | Test $R^2$ |
+| Model Architecture | Hyperparameters | Cross-Validation RMSE <br/>($\text{d}^{-1}$) | Test RMSE <br/>($\text{d}^{-1}$) | Test $R^2$ |
 | :--- | :--- | :---: | :---: | :---: |
 | Linear Regression | Degree = 1 (OLS) | 0.180363 | 0.171968 | -0.087694 |
 | Polynomial Regression | Degree = 2 | 0.159244 | 0.145497 | 0.221390 |
@@ -149,7 +149,7 @@ A parity plot comparing predicted growth rates against actual measured values sh
 
 An $R^2$ value of $0.2214$ indicates that while the model captures approximately twenty-two percent of target variance, a substantial portion of variance remains unexplained. This unaccounted variance stems from inherent biological stochasticity, unmeasured cellular parameters (e.g., dissolved oxygen, cell viability, amino acid concentrations), and mathematical limits of second-order Taylor approximations.
 
-| Polynomial Regression Parity Plot (Degree = 2) | KNN Regression Parity Plot ($k = 15$, Distance Weighted) |
+| Polynomial Regression Parity Plot <br/>(Degree = 2) | KNN Regression Parity Plot <br/>($k = 15$, Distance Weighted) |
 | :---: | :---: |
 | <img src="figures/figure_actual_vs_predicted_polynomial_regression.png" width="400"> | <img src="figures/figure_actual_vs_predicted_knn_regression.png" width="400"> |
 
