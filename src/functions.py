@@ -156,7 +156,7 @@ def plot_feature_correlations(filepath, figures_dir="figures"):
 
 
 def plot_model_comparison_rmse(results_list, figures_dir="figures"):
-  """Generates and saves a bar chart comparing Test RMSE across compared models."""
+  """Generates and saves a bar chart comparing Test RMSE across compared models (without data labels)."""
   os.makedirs(figures_dir, exist_ok=True)
   df = pd.DataFrame(results_list)
 
@@ -165,7 +165,7 @@ def plot_model_comparison_rmse(results_list, figures_dir="figures"):
 
   fig, ax = plt.subplots(figsize=(6.5, 5), dpi=200, layout="constrained")
   color = "tab:blue"
-  bars = ax.bar(
+  ax.bar(
       models, test_rmses, color=color, alpha=0.8, edgecolor="black", width=0.5
   )
   ax.set_xlabel("Model", fontsize=12)
@@ -176,24 +176,13 @@ def plot_model_comparison_rmse(results_list, figures_dir="figures"):
   ax.set_xticklabels(models, rotation=15, ha="right", fontsize=10)
   ax.tick_params(axis="both", which="major", labelsize=10)
 
-  for bar in bars:
-    yval = bar.get_height()
-    ax.text(
-        bar.get_x() + bar.get_width() / 2.0,
-        yval + 0.002,
-        f"{yval:.4f}",
-        ha="center",
-        va="bottom",
-        fontsize=9,
-    )
-
   filepath = os.path.join(figures_dir, "figure_model_comparison_rmse.png")
   fig.savefig(filepath)
   plt.close(fig)
 
 
 def plot_model_comparison_r2(results_list, figures_dir="figures"):
-  """Generates and saves a bar chart comparing Test R^2 across compared models."""
+  """Generates and saves a bar chart comparing Test R^2 across compared models (without data labels)."""
   os.makedirs(figures_dir, exist_ok=True)
   df = pd.DataFrame(results_list)
 
@@ -202,7 +191,7 @@ def plot_model_comparison_r2(results_list, figures_dir="figures"):
 
   fig, ax = plt.subplots(figsize=(6.5, 5), dpi=200, layout="constrained")
   color = "tab:orange"
-  bars = ax.bar(
+  ax.bar(
       models, test_r2s, color=color, alpha=0.8, edgecolor="black", width=0.5
   )
   ax.set_xlabel("Model", fontsize=12)
@@ -213,18 +202,6 @@ def plot_model_comparison_r2(results_list, figures_dir="figures"):
   ax.set_xticklabels(models, rotation=15, ha="right", fontsize=10)
   ax.tick_params(axis="both", which="major", labelsize=10)
   ax.axhline(0, color="black", linewidth=0.8, linestyle="--")
-
-  for bar in bars:
-    yval = bar.get_height()
-    va_val = "bottom" if yval >= 0 else "top"
-    ax.text(
-        bar.get_x() + bar.get_width() / 2.0,
-        yval + (0.01 if yval >= 0 else -0.03),
-        f"{yval:.4f}",
-        ha="center",
-        va=va_val,
-        fontsize=9,
-    )
 
   filepath = os.path.join(figures_dir, "figure_model_comparison_r2.png")
   fig.savefig(filepath)
