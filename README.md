@@ -100,9 +100,8 @@ Polynomial regression achieved the lowest cross-validation root mean squared err
 
 A negative coefficient of determination ($R^2$) signifies that ordinary linear regression performs worse than a naive baseline model that simply predicts the empirical target mean for every observation. This outcome demonstrates that the biological relationships linking temperature, pH, glucose concentration, and lactate concentration to specific cell growth rates are intrinsically non-linear and cannot be captured by simple first-order linear combinations.
 
-| Model Comparison (Test RMSE) | Model Comparison (Test R²) |
-| :---: | :---: |
-| <img src="figures/figure_model_comparison_rmse.png" width="400"> | <img src="figures/figure_model_comparison_r2.png" width="400"> |
+**Figure: Model Comparison Bar Chart**
+![Model Comparison Bar Chart](figures/figure_model_comparison_bar.png)
 
 ---
 
