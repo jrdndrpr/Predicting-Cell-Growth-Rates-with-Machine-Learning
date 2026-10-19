@@ -142,7 +142,7 @@ The model compresses predictions toward the median, tending to overpredict slow-
 
 | Polynomial Regression Parity Plot | KNN Regression Parity Plot |
 | :---: | :---: |
-| `figures/figure_actual_vs_predicted_polynomial_regression.png`<br>![Polynomial Parity](figures/figure_actual_vs_predicted_polynomial_regression.png) | `figures/figure_actual_vs_predicted_knn_regression.png`<br>![KNN Parity](figures/figure_actual_vs_predicted_knn_regression.png) |
+| <img src="figures/figure_actual_vs_predicted_polynomial_regression.png" width="400"> | <img src="figures/figure_actual_vs_predicted_knn_regression.png" width="400"> |
 
 ---
 
