@@ -90,7 +90,7 @@ A feature-effects visualization script passes synthetic ranges for each variable
 
 Three machine learning regression model architectures were benchmarked to predict specific cell growth rates based on cell culture operating conditions: linear regression, polynomial regression, and k-nearest neighbors (kNN) regression. Every model was trained and evaluated using cross-validation on an eighty percent training split, followed by final performance scoring on an isolated, untouched twenty percent test dataset.
 
-| Model Architecture | Hyperparameters | Test RMSE <br/>($\text{d}^{-1}$) | Test $R^2$ |
+| Model Architecture | Hyperparameters | Test RMSE ($\text{d}^{-1}$) | Test $R^2$ |
 | :--- | :--- | :---: | :---: |
 | Standard Linear Regression | None | 0.171968 | -0.087694 |
 | Polynomial Regression | Degree = 2 | 0.145497 | 0.221390 |
@@ -100,7 +100,7 @@ Polynomial regression achieved the lowest test set RMSE at $0.1455\,\text{d}^{-1
 
 A negative coefficient of determination ($R^2$) signifies that ordinary linear regression performs worse than a naive baseline model that simply predicts the empirical target mean for every observation. This outcome demonstrates that the biological relationships linking temperature, pH, glucose concentration, and lactate concentration to specific cell growth rates are intrinsically non-linear.
 
-| Model Comparison <br/>(Test RMSE) | Model Comparison <br/>(Test $R^2$) |
+| Model Comparison (Test RMSE) | Model Comparison (Test $R^2$) |
 | :---: | :---: |
 | <img src="figures/figure_model_comparison_rmse.png" width="400"> | <img src="figures/figure_model_comparison_r2.png" width="400"> |
 
@@ -110,12 +110,14 @@ A negative coefficient of determination ($R^2$) signifies that ordinary linear r
 
 To identify the optimal polynomial model complexity, polynomial feature expansions of degree 1, 2, 3, and 4 were evaluated using cross-validation across the training dataset.
 
-Evaluating cross-validation error across polynomial orders reveals a classical bias-variance trade-off trajectory:
+Evaluating error across polynomial orders reveals the following trajectory:
 
-* **Degree 2 Polynomial:** Achieved optimal generalization performance ($RMSE \approx 0.1592\,\text{d}^{-1}$).
-* **Degree 3 & 4 Polynomials:** Exhibited higher validation errors due to model overparameterization and noise fitting.
+* **Degree 1 (Linear):** High testing error ($RMSE \approx 0.1725\,\text{d}^{-1}$) due to underfitting.
+* **Degree 2 Polynomial:** Achieves robust generalization ($RMSE \approx 0.1570\,\text{d}^{-1}$) with controlled model complexity and smoothness.
+* **Degree 3 Polynomial:** Reaches the lowest testing error on the complexity curve ($RMSE \approx 0.1504\,\text{d}^{-1}$).
+* **Degree 4 Polynomial:** Suffers severe test error inflation ($RMSE \approx 0.1775\,\text{d}^{-1}$) due to overparameterization and noise fitting in the expanded feature space.
 
-A degree-2 polynomial expansion generates quadratic terms (representing single-variable parabolic curvature) and interaction terms (representing synergistic co-dependencies between operational factors). This structure provides sufficient model flexibility to represent physiological optima and metabolic interactions without introducing excessive parameter variance.
+While Degree 3 yields a slightly lower test error, Degree 2 provides a cleaner, more parsimonious response surface with fewer interaction terms, making it the preferred primary model to avoid overfitting higher-order noise.
 
 **Figure: Polynomial Complexity Curve**
 ![Polynomial Complexity Curve](figures/figure_polynomial_complexity.png)
@@ -138,7 +140,7 @@ The non-parametric kNN regression algorithm was tuned across neighborhood sizes 
 
 The selected degree-2 polynomial model was evaluated against the unseen test dataset, yielding a final test RMSE of $0.1455\,\text{d}^{-1}$ and a test $R^2$ of $0.2214$.
 
-| Polynomial Regression Parity Plot <br/>(Degree = 2) | kNN Regression Parity Plot <br/>($k = 15$, Distance Weighted) |
+| Polynomial Regression Parity Plot (Degree = 2) | kNN Regression Parity Plot ($k = 15$, Distance Weighted) |
 | :---: | :---: |
 | <img src="figures/figure_actual_vs_predicted_polynomial_regression.png" width="400"> | <img src="figures/figure_actual_vs_predicted_knn_regression.png" width="400"> |
 
