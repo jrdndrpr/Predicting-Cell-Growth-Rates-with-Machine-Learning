@@ -62,9 +62,9 @@ Grid search cross-validation (`GridSearchCV`) evaluates polynomial degrees 2, 3,
 
 ### K-Nearest Neighbors Regression
 
-K-nearest neighbors (KNN) regression serves as a non-parametric alternative, estimating target values based on localized feature-space neighborhoods. Because distance metrics govern neighbor selection, input variables are standardized prior to model training.
+K-nearest neighbors (kNN) regression serves as a non-parametric alternative, estimating target values based on localized feature-space neighborhoods. Because distance metrics govern neighbor selection, input variables are standardized prior to model training.
 
-The evaluation sweeps neighbor counts ($k \in \{3, 5, 7, 9, 11, 15, 21\}$) alongside uniform and distance-based weighting rules using `GridSearchCV`. Distance weighting assigns higher influence to closer points. The optimal KNN setup utilizes 15 neighbors with distance weighting.
+The evaluation sweeps neighbor counts ($k \in \{3, 5, 7, 9, 11, 15, 21\}$) alongside uniform and distance-based weighting rules using `GridSearchCV`. Distance weighting assigns higher influence to closer points. The optimal kNN setup utilizes 15 neighbors with distance weighting.
 
 ---
 
@@ -88,7 +88,7 @@ A feature-effects visualization script passes synthetic ranges for each variable
 
 ### Model Comparison Summary
 
-Three machine learning regression model architectures were benchmarked to predict specific cell growth rates based on cell culture operating conditions: linear regression, polynomial regression, and k-nearest neighbors (KNN) regression. Every model was trained and evaluated using cross-validation on an eighty percent training split, followed by final performance scoring on an isolated, untouched twenty percent test dataset.
+Three machine learning regression model architectures were benchmarked to predict specific cell growth rates based on cell culture operating conditions: linear regression, polynomial regression, and k-nearest neighbors (kNN) regression. Every model was trained and evaluated using cross-validation on an eighty percent training split, followed by final performance scoring on an isolated, untouched twenty percent test dataset.
 
 | Model Architecture | Hyperparameters | Test RMSE <br/>($\text{d}^{-1}$) | Test $R^2$ |
 | :--- | :--- | :---: | :---: |
@@ -96,7 +96,7 @@ Three machine learning regression model architectures were benchmarked to predic
 | Polynomial Regression | Degree = 2 | 0.145497 | 0.221390 |
 | Optimized kNN Regression | $k = 15$, weights = distance | 0.147379 | 0.201121 |
 
-Polynomial regression achieved the lowest test set RMSE at $0.1455\,\text{d}^{-1}$ and the highest coefficient of determination ($R^2 = 0.2214$). KNN regression demonstrated competitive performance, achieving a test RMSE of $0.1474\,\text{d}^{-1}$ and a test $R^2$ of $0.2011$. Conversely, linear regression performed poorly, yielding a test RMSE of $0.1720\,\text{d}^{-1}$ and a negative test $R^2$ of $-0.0877$.
+Polynomial regression achieved the lowest test set RMSE at $0.1455\,\text{d}^{-1}$ and the highest coefficient of determination ($R^2 = 0.2214$). kNN regression demonstrated competitive performance, achieving a test RMSE of $0.1474\,\text{d}^{-1}$ and a test $R^2$ of $0.2011$. Conversely, linear regression performed poorly, yielding a test RMSE of $0.1720\,\text{d}^{-1}$ and a negative test $R^2$ of $-0.0877$.
 
 A negative coefficient of determination ($R^2$) signifies that ordinary linear regression performs worse than a naive baseline model that simply predicts the empirical target mean for every observation. This outcome demonstrates that the biological relationships linking temperature, pH, glucose concentration, and lactate concentration to specific cell growth rates are intrinsically non-linear.
 
@@ -124,13 +124,13 @@ A degree-2 polynomial expansion generates quadratic terms (representing single-v
 
 ### K-Nearest Neighbors Parameter Sweep Analysis
 
-The non-parametric KNN regression algorithm was tuned across neighborhood sizes ($k \in \{3, 5, 7, 9, 11, 15, 21\}$) and weighting schemas (uniform vs. inverse distance weighting) using cross-validation.
+The non-parametric kNN regression algorithm was tuned across neighborhood sizes ($k \in \{3, 5, 7, 9, 11, 15, 21\}$) and weighting schemas (uniform vs. inverse distance weighting) using cross-validation.
 
 * **Small Neighborhood Sizes ($k = 3$ to $k = 5$):** Produced high error due to localized, high-variance decision boundaries.
 * **Moderate Neighborhood Sizes ($k = 15$):** Yielded steady validation error reduction, reaching optimal performance with inverse distance weighting.
 
-**Figure: KNN Complexity Curve**
-![KNN Complexity Curve](figures/figure_knn_complexity.png)
+**Figure: kNN Complexity Curve**
+![kNN Complexity Curve](figures/figure_knn_complexity.png)
 
 ---
 
@@ -138,7 +138,7 @@ The non-parametric KNN regression algorithm was tuned across neighborhood sizes 
 
 The selected degree-2 polynomial model was evaluated against the unseen test dataset, yielding a final test RMSE of $0.1455\,\text{d}^{-1}$ and a test $R^2$ of $0.2214$.
 
-| Polynomial Regression Parity Plot <br/>(Degree = 2) | KNN Regression Parity Plot <br/>($k = 15$, Distance Weighted) |
+| Polynomial Regression Parity Plot <br/>(Degree = 2) | kNN Regression Parity Plot <br/>($k = 15$, Distance Weighted) |
 | :---: | :---: |
 | <img src="figures/figure_actual_vs_predicted_polynomial_regression.png" width="400"> | <img src="figures/figure_actual_vs_predicted_knn_regression.png" width="400"> |
 
