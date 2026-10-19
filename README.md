@@ -101,7 +101,6 @@ Polynomial regression achieved the lowest cross-validation RMSE ($0.1592\,\text{
 A negative $R^2$ indicates that the linear model underperformed compared to a simple horizontal mean baseline. This confirms that bioprocess growth rates exhibit strong nonlinear dependencies that linear formulas fail to capture.
 
 **Figure: Model Comparison Bar Chart**
-`figures/figure_model_comparison_bar.png`
 ![Model Comparison Bar Chart](figures/figure_model_comparison_bar.png)
 
 ---
@@ -117,7 +116,6 @@ Cross-validation evaluation of degrees 2, 3, and 4 revealed clear performance sh
 A second-order architecture provides sufficient mathematical curvature and interaction terms to mimic physiological optima without courting high-variance overfitting. Higher-order models fit idiosyncratic training noise rather than generalizable biological trends, justifying the selection of degree 2.
 
 **Figure: Polynomial Complexity Curve**
-`figures/figure_polynomial_complexity.png`
 ![Polynomial Complexity Curve](figures/figure_polynomial_complexity.png)
 
 ---
@@ -129,7 +127,6 @@ The KNN hyperparameter sweep demonstrated that prediction stability improves as 
 Although KNN approached polynomial accuracy, its cross-validation error remained marginally higher. Furthermore, polynomial regression generates continuous, differentiable response functions, making it more favorable for subsequent process interpretation than localized KNN neighborhoods.
 
 **Figure: KNN Complexity Curve**
-`figures/figure_knn_complexity.png`
 ![KNN Complexity Curve](figures/figure_knn_complexity.png)
 
 ---
@@ -158,7 +155,6 @@ Evaluating individual feature trajectories while holding constant variables at t
 These trends reflect model correlations rather than absolute causal mechanisms, compounded by variable interaction terms in the polynomial equation.
 
 **Figure: Process Variable Effects**
-`figures/figure_process_variable_effects.png`
 ![Process Variables Effect](figures/figure_process_variable_effects.png)
 
 ---
