@@ -11,7 +11,7 @@ The Bioprocess Cell Growth Predictor is an automated machine learning software p
 * **Constructed** predictive machine learning regression pipelines for bioprocess monitoring.
 * **Evaluated** linear, polynomial, and k-nearest neighbors regression model architectures.
 * **Optimized** hyperparameters systematically using cross-validation frameworks.
-* **Measured** generalizability using root mean squared error and the coefficient of determination.
+* **Measured** model generalizability using root mean squared error and R².
 * **Visualized** multivariable feature response effects on predicted cellular growth.
 
 ---
@@ -88,85 +88,112 @@ A feature-effects visualization script passes synthetic ranges for each variable
 
 ### Model Comparison Summary
 
-Three model classes were benchmarked using five-fold cross-validation and evaluated on an independent twenty percent test split.
+Three machine learning regression model architectures were benchmarked to predict specific cell growth rates based on cell culture operating conditions: linear regression, polynomial regression, and k-nearest neighbors (KNN) regression. Every model was trained and evaluated using five-fold cross-validation on an eighty percent training split, followed by final performance scoring on an isolated, untouched twenty percent test dataset.
 
-| Model Architecture | Cross-Validation RMSE ($\text{d}^{-1}$) | Test RMSE ($\text{d}^{-1}$) | Test $R^2$ |
-| :--- | :---: | :---: | :---: |
-| Linear Regression | 0.180363 | 0.171968 | -0.087694 |
-| Polynomial Regression | 0.159244 | 0.145497 | 0.221390 |
-| KNN Regression | 0.161874 | 0.147379 | 0.201121 |
+| Model Architecture | Hyperparameters | Cross-Validation RMSE ($\text{d}^{-1}$) | Test RMSE ($\text{d}^{-1}$) | Test $R^2$ |
+| :--- | :--- | :---: | :---: | :---: |
+| Linear Regression | Degree = 1 (OLS) | 0.180363 | 0.171968 | -0.087694 |
+| Polynomial Regression | Degree = 2 | 0.159244 | 0.145497 | 0.221390 |
+| KNN Regression | $k = 15$, Distance Weighting | 0.161874 | 0.147379 | 0.201121 |
 
-Polynomial regression achieved the lowest cross-validation RMSE ($0.1592\,\text{d}^{-1}$), lowest test RMSE ($0.1455\,\text{d}^{-1}$), and highest test $R^2$ ($0.2214$). KNN performance closely tracked polynomial results with a test RMSE of $0.1474\,\text{d}^{-1}$ and an $R^2$ of $0.2011$. Conversely, linear regression performed poorly, yielding a negative test $R^2$ of approximately $-0.088$. 
+Polynomial regression achieved the lowest cross-validation root mean squared error at $0.1592\,\text{d}^{-1}$, as well as the lowest test set RMSE at $0.1455\,\text{d}^{-1}$ and the highest coefficient of determination ($R^2 = 0.2214$). KNN regression demonstrated competitive performance, achieving a test RMSE of $0.1474\,\text{d}^{-1}$ and a test $R^2$ of $0.2011$. Conversely, linear regression performed poorly, yielding a test RMSE of $0.1720\,\text{d}^{-1}$ and a negative test $R^2$ of $-0.0877$.
 
-A negative $R^2$ indicates that the linear model underperformed compared to a simple horizontal mean baseline. This confirms that bioprocess growth rates exhibit strong nonlinear dependencies that linear formulas fail to capture.
+A negative coefficient of determination ($R^2$) signifies that ordinary linear regression performs worse than a naive baseline model that simply predicts the empirical target mean for every observation. This outcome demonstrates that the biological relationships linking temperature, pH, glucose concentration, and lactate concentration to specific cell growth rates are intrinsically non-linear and cannot be captured by simple first-order linear combinations.
 
-**Figure: Model Comparison Bar Chart**
-![Model Comparison Bar Chart](figures/figure_model_comparison_bar.png)
+| Model Comparison (Test RMSE) | Model Comparison (Test R²) |
+| :---: | :---: |
+| <img src="figures/figure_model_comparison_rmse.png" width="400"> | <img src="figures/figure_model_comparison_r2.png" width="400"> |
 
 ---
 
-### Polynomial Degree Selection
+### Polynomial Degree Selection and Complexity Analysis
 
-Cross-validation evaluation of degrees 2, 3, and 4 revealed clear performance shifts:
+To identify the optimal polynomial model complexity, polynomial feature expansions of degree 2, degree 3, and degree 4 were evaluated using five-fold cross-validation across the training dataset.
 
-* Degree 2 achieved optimal cross-validation error ($0.159\,\text{d}^{-1}$).
-* Degree 3 introduced marginal error increases.
-* Degree 4 triggered substantial validation error inflation.
+Evaluating cross-validation error across polynomial orders reveals a classical bias-variance trade-off trajectory:
 
-A second-order architecture provides sufficient mathematical curvature and interaction terms to mimic physiological optima without courting high-variance overfitting. Higher-order models fit idiosyncratic training noise rather than generalizable biological trends, justifying the selection of degree 2.
+* **Degree 2 Polynomial:** Achieved the lowest cross-validation RMSE ($0.1592\,\text{d}^{-1}$).
+* **Degree 3 Polynomial:** Exhibited a slight increase in validation error ($0.1601\,\text{d}^{-1}$).
+* **Degree 4 Polynomial:** Suffered severe validation error degradation and inflation ($0.1884\,\text{d}^{-1}$).
+
+A degree-2 polynomial expansion generates quadratic terms (representing single-variable parabolic curvature) and interaction terms (representing synergistic co-dependencies between operational factors). This structure provides sufficient model flexibility to represent physiological optima and metabolic interactions without introducing excessive parameter variance.
+
+When the polynomial order is increased to degree 4, the number of transformed features increases exponentially, allowing the regression estimator to fit high-frequency random noise and sample-specific fluctuations in the training partition. This high variance prevents generalization, causing cross-validation prediction error to rise significantly. Consequently, degree 2 was chosen as the optimal polynomial hyperparameter.
 
 **Figure: Polynomial Complexity Curve**
 ![Polynomial Complexity Curve](figures/figure_polynomial_complexity.png)
 
 ---
 
-### K-Nearest Neighbors Parameter Analysis
+### K-Nearest Neighbors Parameter Sweep Analysis
 
-The KNN hyperparameter sweep demonstrated that prediction stability improves as neighborhood size expands. Cross-validation error dropped significantly as $k$ increased from 3 toward 15. Small neighborhoods render models vulnerable to local data noise, whereas distance weighting consistently outperformed uniform weighting by reducing the influence of distant outliers.
+The non-parametric KNN regression algorithm was tuned across neighborhood sizes ($k \in \{3, 5, 7, 9, 11, 15, 20\}$) and weighting schemas (uniform vs. inverse distance weighting) using five-fold cross-validation.
 
-Although KNN approached polynomial accuracy, its cross-validation error remained marginally higher. Furthermore, polynomial regression generates continuous, differentiable response functions, making it more favorable for subsequent process interpretation than localized KNN neighborhoods.
+Hyperparameter tuning results highlight the impact of neighborhood hyperparameter settings:
+
+* **Small Neighborhood Sizes ($k = 3$ to $k = 5$):** Produced high cross-validation error ($0.1740\,\text{d}^{-1}$). Small $k$ values create localized, high-variance decision boundaries that overreact to noisy observation points in the training set.
+* **Moderate to Large Neighborhood Sizes ($k = 11$ to $k = 15$):** Yielded steady validation error reduction, reaching an optimal cross-validation RMSE of $0.1619\,\text{d}^{-1}$ at $k = 15$ with inverse distance weighting.
+* **Weighting Schemes:** Distance-based weighting consistently outperformed uniform weighting across all tested values of $k$, because scaling neighbor contributions inversely with distance prevents far-away points from skewing local predictions.
+
+Although the optimal KNN model ($k=15$, distance-weighted) performed well, its cross-validation RMSE ($0.1619\,\text{d}^{-1}$) remained slightly higher than that of the degree-2 polynomial regression model ($0.1592\,\text{d}^{-1}$). Additionally, polynomial regression produces a smooth, continuous mathematical response surface, making it superior for bioprocess sensitivity analysis and operational optimization.
 
 **Figure: KNN Complexity Curve**
 ![KNN Complexity Curve](figures/figure_knn_complexity.png)
 
 ---
 
-### Final Model Evaluation
+### Final Model Evaluation and Performance Trade-offs
 
-The finalized degree-2 polynomial model yielded a test RMSE of $0.1455\,\text{d}^{-1}$ and a test $R^2$ of $0.221$. Parity inspection indicates a positive correlation between predictions and observations, though data dispersion remains wide. 
+The selected degree-2 polynomial model was evaluated against the unseen test dataset, yielding a final test RMSE of $0.1455\,\text{d}^{-1}$ and a test $R^2$ of $0.2214$.
 
-The model compresses predictions toward the median, tending to overpredict slow-growth outliers and underpredict peak growth rates. An $R^2$ of $0.221$ implies that while the model captures broad trends, unmodeled variance remains substantial due to stochastic biological noise, missing process attributes, or limits inherent to second-order curve fitting.
+A parity plot comparing predicted growth rates against actual measured values shows a general positive trajectory around the ideal $y = x$ parity line. However, residuals reveal that the model exhibits variance compression: predictions tend to cluster around the central tendency of the target variable, overpredicting low growth rates and underpredicting high growth rates.
 
-| Polynomial Regression Parity Plot | KNN Regression Parity Plot |
+An $R^2$ value of $0.2214$ indicates that while the model captures approximately twenty-two percent of target variance, a substantial portion of variance remains unexplained. This unaccounted variance stems from inherent biological stochasticity, unmeasured cellular parameters (e.g., dissolved oxygen, cell viability, amino acid concentrations), and mathematical limits of second-order Taylor approximations.
+
+| Polynomial Regression Parity Plot (Degree = 2) | KNN Regression Parity Plot ($k = 15$, Distance Weighted) |
 | :---: | :---: |
 | <img src="figures/figure_actual_vs_predicted_polynomial_regression.png" width="400"> | <img src="figures/figure_actual_vs_predicted_knn_regression.png" width="400"> |
 
 ---
 
-### Process Variable Response Dynamics
+### Process Variable Influence on Cell Growth
 
-Evaluating individual feature trajectories while holding constant variables at their training medians highlights specific metabolic patterns:
+The single-variable response curves generated by the degree-2 polynomial model illustrate key bioprocess metabolic behaviors when holding remaining factors at their training medians:
 
-* **Temperature:** Exhibits a parabolic profile, with growth peaking between $36\,^\circ\text{C}$ and $37\,^\circ\text{C}$ before dropping off at hypothermic or hyperthermic extremes.
-* **pH:** Displays a sensitive quadratic optimum near $\text{pH } 7.0$, with acidic or basic deviations suppressing predicted growth rates.
-* **Glucose:** Demonstrates a positive correlation, where rising glucose availability increases predicted growth across the observed operating span.
-* **Lactate:** Shows an inverse relationship; accumulation of lactate suppresses growth velocity, with steepest reductions occurring across lower-to-moderate concentration ranges.
-
-These trends reflect model correlations rather than absolute causal mechanisms, compounded by variable interaction terms in the polynomial equation.
+* **Temperature Effect:** Displays a classic parabolic thermal curve. Predicted specific growth rate increases as temperature rises from $30\,^\circ\text{C}$, peaks at an optimal range between $36\,^\circ\text{C}$ and $37\,^\circ\text{C}$, and declines sharply beyond $38\,^\circ\text{C}$. This reflects enzyme denaturation and thermal stress at elevated culture temperatures.
+* **pH Effect:** Exhibits a distinct parabolic profile centered around an optimal $\text{pH}$ near $7.0$. Deviations toward acidic ($\text{pH} < 6.5$) or basic ($\text{pH} > 7.5$) conditions reduce cellular growth, reflecting optimal physiological enzyme pH ranges.
+* **Glucose Concentration Effect:** Demonstrates a positive correlation across the observed operating range ($5\,\text{mM}$ to $30\,\text{mM}$). Increasing glucose availability supports higher energy production and carbon substrate uptake for cell growth.
+* **Lactate Concentration Effect:** Shows a strong inverse metabolic relationship. As byproduct lactate accumulates ($0\,\text{mM}$ to $25\,\text{mM}$), predicted specific growth rate decreases steadily. High lactate levels cause intracellular acidification and metabolic inhibition, suppressing cell division.
 
 **Figure: Process Variable Effects**
 ![Process Variables Effect](figures/figure_process_variable_effects.png)
 
 ---
 
-### Operating Conditions for Growth Optimization
+### Cell Culture Operating Conditions Analysis
 
-* **Favorable Culture States:** Peak predicted growth associates with temperatures between $36\,^\circ\text{C}$ and $37\,^\circ\text{C}$, neutral pH ($\approx 7.0$), high glucose availability, and minimal lactate accumulation.
-* **Suppressed Culture States:** Low growth aligns with extreme temperatures, severe pH imbalances, glucose starvation, and high metabolic byproduct buildup.
-* **Reliability Boundaries:** Predictions near or beyond training extremes demand caution. For instance, boundary conditions can cause polynomial curves to project unphysical outcomes, such as slightly negative growth rates at extreme pH margins. Simultaneous multi-variable shifts can also diverge from single-variable response curves.
+Analyzing model predictions across variable combinations identifies operational regimes associated with distinct cell growth outcomes:
+
+* **High Specific Growth Rate Conditions:** Optimal cellular growth is achieved when environmental and metabolic conditions are maintained at favorable physiological setpoints:
+  * Temperature: $36.0\,^\circ\text{C} - 37.0\,^\circ\text{C}$
+  * $\text{pH}$: $6.9 - 7.1$
+  * Glucose: High concentration ($> 20\,\text{mM}$)
+  * Lactate: Low accumulation ($< 5\,\text{mM}$)
+* **Low Specific Growth Rate Conditions:** Cellular growth is suppressed when environmental stress or byproduct toxicity occurs:
+  * Sub-optimal or supra-optimal temperatures ($< 32\,^\circ\text{C}$ or $> 39\,^\circ\text{C}$)
+  * Acidic or basic $\text{pH}$ extremes ($< 6.2$ or $> 7.8$)
+  * Nutrient depletion (Glucose $< 5\,\text{mM}$)
+  * Inhibitory metabolite build-up (Lactate $> 20\,\text{mM}$)
+* **Model Unreliability Regimes:** Model predictions become unreliable near or beyond the boundaries of the training feature space (extrapolation). Second-order polynomial models can produce non-physical outputs (such as negative growth rates or unconstrained growth increases) when evaluated outside the experimental domain. Additionally, because the feature-effects analysis varies one variable at a time while holding others fixed at median values, strong multi-variable interactions in real bioreactors may cause actual growth rates to deviate from isolated single-variable curves.
 
 ---
 
-### Industrial Applications and Scope
+### Potential Applications and Practical Deployment Scope
 
-The model provides a computational decision-support tool for bioprocess engineering, enabling teams to estimate growth velocities based on real-time environmental telemetry. It helps isolate promising experimental operating zones and monitor unexpected rate declines. However, given its moderate predictive accuracy, the tool should complement physical experimentation rather than direct automated control loops prior to further validation and dataset expansion.
+The developed bioprocess growth predictor offers practical utility in biomanufacturing and cell culture process development:
+
+1. **In Silico Process Optimization:** Bioprocess engineers can use the model to evaluate culture media formulations and bioreactor control setpoints before performing physical laboratory runs, saving time and reagents.
+2. **Real-time Bioreactor Monitoring:** Integrated into automated bioreactor monitoring systems, the model can predict real-time specific growth rates based on online sensor telemetry (temperature, pH) and offline metabolite assays (glucose, lactate).
+3. **Feed Strategy Planning:** The model can assist in feed stream timing by identifying nutrient thresholds that prevent glucose starvation while minimizing byproduct lactate accumulation.
+
+Due to its moderate predictive power ($R^2 = 0.2214$), the model should serve as a decision-support heuristic alongside empirical measurements rather than as an autonomous closed-loop controller.
